@@ -1,43 +1,54 @@
 import numpy as np
-import sys 
+#this is for getting my activation functions from activation repository
+import sys
 sys.path.append('../')
-
-from activation import activation
+from activation.activation import activation
 
 activation = activation()
 
 np.random.seed(0)
 
-w = np.random.rand(9, 2)
+#create rnn class
+class rnn:
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        self.input_dim = input_dim
+        self.hidden_dim = hidden_dim
+        self.output_dim = output_dim
+        
+        #initialize weights
+        self.U = np.random.rand(input_dim, hidden_dim)
+        self.W = np.random.rand(hidden_dim, hidden_dim)
+        self.V = np.random.rand(hidden_dim, output_dim)
+        #add bias term
+        self.b = np.random.rand(hidden_dim)
+        
+        #initialize hidden state
+        self.h = np.zeros((hidden_dim,))
+    
+    def forward(self, x):
+        #compute new hidden state
+        self.h = activation.tanh(np.dot(x, self.U) + np.dot(self.h, self.W))
+        
+        #compute output
+        y = activation.softmax(np.dot(self.h, self.V), std=True)
+        
+        return y
 
-x1 = np.array([1,2,3])
-x2 = np.array([4,5,6])
-x3 = np.array([7,8,9])
+#set dimensions for rnn 
+input_dim = 3
+hidden_dim = 5
+output_dim = 2
+#initialize rnn
+rnn = rnn(input_dim, hidden_dim, output_dim)
+#example input
+apple = np.array([1, 0, 0])
+banana = np.array([0, 1, 0])
+cherry = np.array([0, 0, 1])
 
-e1 = np.concatenate((x1, x2, x3), axis=0)
-e2 = np.concatenate((x2, x1, x3), axis=0)
+#print the variable name 
+dictionary = {'apple': apple, 'banana': banana, 'cherry': cherry}
 
-e = np.array([e1, e2])
-
-vocabulary = ('apple', 'bannana', 'cake')
-
-sentence = [0 for i in range(3)]
-
-for _ in range(3):
-    sentence[_] = np.array(e1[_:_ + 3])
-
-y = np.zeros((1, len(vocabulary)))
-for i in range(len(sentence)):
-    w = np.random.rand(len(vocabulary), len(vocabulary))
-    y += w@sentence[i]
-print(activation.softmax(y, std = False))
-
-for _ in range(3):
-    sentence[_] = np.array(e2[_:_ + 3])
-
-y = np.zeros((1, len(vocabulary)))
-for i in range(len(sentence)):
-    w = np.random.rand(len(vocabulary), len(vocabulary))
-    y += w@sentence[i]
-
-print(activation.sigmoid(np.sum(x1)))
+#run the rnn model on the example input
+for fruit, vector in dictionary.items():
+    output = rnn.forward(vector)
+    print(f"current word: {fruit}, output: {output}")
