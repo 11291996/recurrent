@@ -19,7 +19,7 @@ cherry = torch.tensor([0, 0, 1], dtype=torch.float32)
 dictionary = {'apple': apple, 'banana': banana, 'cherry': cherry}
 
 # Initialize the hidden state
-h0 = torch.zeros(1, 1, hidden_dim)  # (num_layers
+h0 = torch.zeros(1, 1, hidden_dim)  # (num_layers, batch_size, hidden_size)
 
 for name, vector in dictionary.items():
     # Reshape the input to match the expected input shape for RNN
